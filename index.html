@@ -1,0 +1,201 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<style>
+/*   DESKTOP DEMO OF SVG EFFECTS. */
+
+@import url("https://fonts.googleapis.com/css?family=Lato");
+
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	background-color: #9387ab;
+	font: 400 10px "Lato", sans-serif;
+	text-align: center;
+}
+
+.header {
+	width: 100%;
+	height: 75px;
+	background: #17141d;
+	opacity: 0.95;
+	overflow: hidden;
+	-webkit-box-shadow: #333 1px 3px 4px;
+	-moz-box-shadow: #333 1px 3px 4px;
+	box-shadow: #333 1px 3px 4px;
+}
+
+.content {
+	width: 100%;
+	height: calc(100% - 75px);
+	background-image: url(https://www.javascriptfreecode.com/uploads/pictures/15-img.jpg);
+	background-size: cover;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	background-color: #9387ab;
+}
+h1 {
+	letter-spacing: 4px;
+	padding: 1em;
+	color: white;
+	background-color: #17141d;
+	opacity: 0.8;
+}
+
+svg.line-top {
+	width: 100%;
+	background-color: #17141d;
+}
+svg.line-bottom {
+	width: 100%;
+}
+.menu {
+	width: 750px;
+	margin: 0 auto;
+}
+ul {
+	padding: 0;
+	margin: 0;
+}
+
+ul li {
+	margin: 0;
+	padding: 10px 0 10px 0;
+	width: 25%;
+	height: 10px;
+	text-align: center;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: white;
+	cursor: pointer;
+	display: inline-block;
+	letter-spacing: 3.5px;
+	transition: all 0.5s ease-out;
+}
+
+li.active {
+	color: orange;
+	transform: scale(1.1);
+}
+
+polygon {
+	stroke-width: 2px;
+	stroke: orange;
+	fill: orange;
+}
+
+@media (max-device-width: 991px) {
+	.header {
+		height: 64px;
+	}
+
+	body {
+		font-size: 0.4em;
+	}
+	.content {
+		height: calc(100% - 64px);
+	}
+}
+</style>
+<div class="header">
+<div class="menu">
+<svg class="line-top" width="750" height="15" viewbox="0,0 1000,20">
+<line class="line-dash" x1="0" y1="15" x2="1000" y2="15" style="stroke: orange; stroke-width:2; stroke-linecap:round; stroke-dasharray: 180,1200; stroke-dashoffset: -35;" />
+</svg>
+<ul>
+<li>Home</li><li>Gallery</li><li>Contact</li><li>About</li>
+</ul>
+<svg class="line-bottom" width="750" height="30" viewbox="0,0 1000,40">
+<polygon class="lb" points="35,53 115,53 125,43 135,53 215,53" />
+<polygon class="lb" points="285,53 365,53 375,43 385,53 465,53" />
+<polygon class="lb" points="535,53 615,53 625,43 635,53 715,53" />
+<polygon class="lb" points="785,53 865,53 875,43 885,53 965,53" />
+</svg>
+</div>
+</div>
+<div class="content">
+<h1>Header Menu</h1>
+</div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js'></script>
+<script>
+const lis = document.querySelectorAll("li");
+const lbs = document.querySelectorAll(".lb");
+const ul = document.querySelector("ul");
+const lineDash = document.querySelector(".line-dash");
+const p1 = document.querySelector(".p1");
+const p2 = document.querySelector(".p2");
+
+var dashOrigin = -35; //pixels
+var selectedLi = -35; //pixels
+var speed = 500; //move this many pixels in one second.
+var distance = 0;
+var time = 0;
+
+// initial animation and class for HOME
+TweenLite.to(lbs[0], 0.6, {
+					y: -43,
+					ease: Bounce.easeOut,
+					delay: 1
+				});
+
+lis[0].classList.add("active");
+
+//push all the bottom lines down.
+function pushDownLb() {
+	for(let k = 0; k < lbs.length; ++k)
+		TweenLite.to(lbs[k], 0.5, {
+					y: 0,
+					ease:  Power3.easeOut
+				});
+}
+
+ul.addEventListener(
+	"mouseleave",
+	function(e) {
+		// to avoid a bug in chrome that sometimes triggers mouseleave on click
+		// and the relatedTarget comes up null
+		if (e.relatedTarget) {
+			distance = Math.abs(dashOrigin - selectedLi);
+			time = distance / speed;
+			dashOrigin = selectedLi;
+			if (time) {
+				// overlaping tweens would give a zero time
+				TweenLite.to(lineDash, time, {
+					strokeDashoffset: selectedLi,
+					ease: Bounce.easeOut
+				});
+			} //if
+		} //if
+	},
+	false
+);
+
+for (let i = 0; i < 4; ++i) {
+	lis[i].addEventListener("mouseover", function() {
+		distance = Math.abs(-250 * i - 35 - dashOrigin);
+		time = distance / speed;
+		dashOrigin = -250 * i - 35;
+		if (time) {
+			TweenLite.to(lineDash, time, {
+				strokeDashoffset: -250 * i - 35,
+				ease: Bounce.easeOut
+			});
+		} //if
+	});
+
+	lis[i].addEventListener("click", function() {
+		selectedLi = -250 * i - 35;
+		pushDownLb();
+		let current = document.getElementsByClassName("active");
+		current[0].classList.remove("active");
+		lis[i].classList.add("active");
+		TweenLite.to(lbs[i], 0.5, {
+					y: -43,
+					ease: Bounce.easeOut
+				});
+	});
+}
+</script><a target="_blank"  style="font-size: 8pt; text-decoration: none;font-family:Tahoma"></a>
